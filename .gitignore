@@ -12,3 +12,5 @@ go.work.sum
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 !*.code-workspace
+
+bin/
