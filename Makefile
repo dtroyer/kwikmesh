@@ -7,15 +7,31 @@ CMD_NAME  := km
 CMD_PKG   := ./cmd/$(CMD_NAME)
 
 GO        ?= go
-GOFLAGS   ?=
+GOFLAGS   ?= -trimpath
 LINT_ARGS :=
+
+# Handle release versioning
+# The semver base is taken from the most recent tagged commit. If the current
+# commit is not tagged, a dev version is created using the most recent tag
+# and the short commit hash.
+VERSION_VAR = kwikmesh/commands.Version
+VERSION := $(shell git describe --exact-match --tags HEAD 2>/dev/null)
+ifeq ($(VERSION),)
+        # Create a dev version: vX.Y.Z-dev
+        VERSION := $(addsuffix -$(shell git rev-parse --short HEAD),$(shell git describe --abbrev=0 --tags HEAD))
+endif
+VERSION_LD := -X $(VERSION_VAR)=$(VERSION)
+
+# Strip debug and DWARF info for release builds.
+RELEASE_LD := -s -w
 
 all: lint test build
 
 .PHONY: build
 build: export CGO_ENABLED=0
+build: LDFLAGS ?= -ldflags "$(VERSION_LD)"
 build:
-	$(GO) build $(GOFLAGS) -o ./bin/$(CMD_NAME) $(CMD_PKG)
+	$(GO) build $(GOFLAGS) $(LDFLAGS) -o ./bin/$(CMD_NAME) $(CMD_PKG)
 
 .PHONY: clean
 clean:
@@ -35,6 +51,18 @@ lint:
 		golangci-lint run ./... $(LINT_ARGS); \
 	else \
 		echo "golangci-lint not installed, skipping"; \
+	fi
+
+.PHONY: release
+release: export CGO_ENABLED=0
+release: LDFLAGS ?= -ldflags "$(VERSION_LD) $(RELEASE_LD)"
+release: lint test
+	@if git describe --exact-match --tags HEAD 2>/dev/null; then \
+		echo "Building release for $(VERSION)"; \
+		$(MAKE) build LDFLAGS='$(LDFLAGS)'; \
+	else \
+		echo "Not on a tagged commit, skipping release build"; \
+		exit 1; \
 	fi
 
 .PHONY: test
