@@ -193,8 +193,11 @@ there so that issues, commits and tests can refer to a single requirement.
   uci and `<endpoint>.sh` for uci-script.
 - **R-CLI-8** `--all` cannot be combined with an endpoint name or with
   `--output`, and `--dir` is only valid with `--all`.
-- **R-CLI-9** With `--all`, a failure for one endpoint doesn't stop the others.
-  All failures are reported at the end, and the exit status is 1.
+- **R-CLI-9** With `--all`, an endpoint whose private key isn't available
+  (none is given, or its `private_key_file` doesn't exist) is not an error: it
+  is skipped with a `skipped <endpoint>: no private key` line, so that its key
+  can be added later. Any other failure for one endpoint doesn't stop the
+  others. All failures are reported at the end, and the exit status is 1.
 
 ### Other commands
 

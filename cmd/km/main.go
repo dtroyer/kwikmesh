@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// RunCommands has already reported the error on stderr.
-	if err := commands.RunCommands(os.Args, os.Stdout, os.Stderr); err != nil {
+	if err := commands.RunCommands(os.Args, os.Stdin, os.Stdout, os.Stderr); err != nil {
 		os.Exit(1)
 	}
 }

@@ -11,8 +11,14 @@ import (
 // run calls RunCommands in-process (R-DEV-5) and returns its output.
 func run(t *testing.T, args ...string) (stdout, stderr string, err error) {
 	t.Helper()
+	return runIn(t, "", args...)
+}
+
+// runIn is run with stdin.
+func runIn(t *testing.T, stdin string, args ...string) (stdout, stderr string, err error) {
+	t.Helper()
 	var out, errOut bytes.Buffer
-	err = RunCommands(append([]string{"km"}, args...), &out, &errOut)
+	err = RunCommands(append([]string{"km"}, args...), strings.NewReader(stdin), &out, &errOut)
 	return out.String(), errOut.String(), err
 }
 
