@@ -104,3 +104,10 @@ km genpsk
 
 OpenWRT has no equivalent of wg-quick's `PreUp`, `PostUp`, `PreDown` and
 `PostDown` hooks, so the OpenWRT formats list them as comments instead.
+
+## License
+
+Much of kwikmesh was written with the help of an AI coding assistant, and
+some of it may not be protected by copyright. Every part of kwikmesh that is
+protected by copyright is licensed under the MIT License; see
+[LICENSE](LICENSE).
