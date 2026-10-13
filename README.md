@@ -111,3 +111,15 @@ Much of kwikmesh was written with the help of an AI coding assistant, and
 some of it may not be protected by copyright. Every part of kwikmesh that is
 protected by copyright is licensed under the MIT License; see
 [LICENSE](LICENSE).
+
+## Notes
+
+This is the third iteration of this project, primarily built from the
+`REQUIREMENTS.md` generated from earlier versions to see how refining the
+steps and starting over changes the ultimate output.  I have not preserved
+the earlier versions as the goal was to get requirements built that captured
+what actually went in to the project.
+
+I am not (yet?) sure any conclusions can be immediately reached other than
+each fresh start clarified requirements.  Finally writing something once and
+throwing it away isn't as painful as it once was.

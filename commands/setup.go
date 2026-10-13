@@ -14,6 +14,10 @@ import (
 	"kwikmesh/internal/render"
 )
 
+var (
+	Version string
+)
+
 // RunCommands runs the km command line with args (including the program
 // name in args[0]), reading input from stdin, writing normal output to
 // stdout and errors to stderr. Any error is also printed to stderr, each
@@ -21,6 +25,7 @@ import (
 func RunCommands(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	app := &cli.Command{
 		Name:           "km",
+		Version:        Version,
 		Usage:          "Generate WireGuard configurations from a common YAML file",
 		Reader:         stdin,
 		Writer:         stdout,
