@@ -175,8 +175,9 @@ there so that issues, commits and tests can refer to a single requirement.
 - **R-CLI-3** The commands are `generate` (alias `gen`), `list` (alias `ls`),
   `validate`, `genkey`, `genpsk` and `pubkey`. `--help` works on the program
   and on each command.
-- **R-CLI-4** Every error is printed to stderr prefixed with `kwikmesh:`, and the
-  exit status is 1. This includes an unknown command and a missing command.
+- **R-CLI-4** Every error is printed to stderr prefixed with `km:`, and the
+  exit status is 1. This includes an unknown command. A missing command is not an
+  error and should display the top-level help output on stderr.
 
 ### generate
 
@@ -226,7 +227,7 @@ there so that issues, commits and tests can refer to a single requirement.
   `golangci-lint` if it is installed.
 - **R-DEV-4** The program is split into `internal/network` (loading,
   validation and building each endpoint's configuration), `internal/render`
-  (the output formats) and `cmd/kwikmesh` (the command line).
+  (the output formats) and `cmd/km` (the command line).
   `internal/network` must not import `internal/render`, which is why the CLI
   checks format names.
 - **R-DEV-5** Each package has tests, and the command line is tested through

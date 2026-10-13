@@ -28,7 +28,14 @@ fmt:
 
 .PHONY: lint
 lint:
-	golangci-lint run ./... $(LINT_ARGS)
+	@out=$$(gofmt -l .); if [ -n "$$out" ]; then echo "gofmt needed:"; echo "$$out"; exit 1; fi
+	$(GO) vet ./...
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		echo "golangci-lint run ./... $(LINT_ARGS)"; \
+		golangci-lint run ./... $(LINT_ARGS); \
+	else \
+		echo "golangci-lint not installed, skipping"; \
+	fi
 
 .PHONY: test
 test:

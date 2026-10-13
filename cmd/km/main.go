@@ -3,16 +3,14 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"kwikmesh/commands"
 )
 
 func main() {
-	err := commands.RunCommands(os.Args)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "exit error: %+v\n", err)
+	// RunCommands has already reported the error on stderr.
+	if err := commands.RunCommands(os.Args, os.Stdout, os.Stderr); err != nil {
 		os.Exit(1)
 	}
 }
