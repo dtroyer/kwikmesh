@@ -75,14 +75,16 @@ km list                          # list endpoints, formats and peers
 km generate laptop               # print laptop's configuration
 km gen laptop -o /etc/wireguard/wg0.conf
 km gen router -f wg -i wg1       # override the format and interface
-km gen --all --dir out           # every endpoint, in its own format
+km gen --all                     # every endpoint, into the network configuration file directory
+km gen --all --dir out           # every endpoint, in its own format, into directory out
 km gen -a -d out -f wg,uci       # every endpoint, in both formats
 ```
 
 `generate --all` writes `<endpoint>.conf` (wg), `<endpoint>.uci` (uci) or
-`<endpoint>.sh` (uci-script) into the directory. Files are created with
-mode 0600, or 0700 for scripts, because they contain private keys. An
-endpoint whose private key isn't available, such as `phone` above, is
+`<endpoint>.sh` (uci-script) into into the directory containing
+the network file, or the directory in `--dir` if is is present. Files are
+created with mode 0600, or 0700 for scripts, because they contain private
+keys. An endpoint whose private key isn't available, such as `phone` above, is
 skipped with a `skipped <endpoint>: no private key` line, so its key can be
 added later.
 

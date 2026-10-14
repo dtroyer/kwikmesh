@@ -41,12 +41,12 @@ func generateCommand() *cli.Command {
 			&cli.BoolFlag{
 				Name:    "all",
 				Aliases: []string{"a"},
-				Usage:   "Generate every endpoint into --dir",
+				Usage:   "Generate every endpoint into the config file's directory, or --dir",
 			},
 			&cli.StringFlag{
 				Name:    "dir",
 				Aliases: []string{"d"},
-				Usage:   "With --all, write files into `<dir>`",
+				Usage:   "Write files into `<dir>` when --all is used",
 			},
 		},
 		Action: generate,
@@ -64,8 +64,6 @@ func generate(_ context.Context, cmd *cli.Command) error {
 			return errors.New("--all cannot be combined with an endpoint name")
 		case cmd.IsSet("output"):
 			return errors.New("--all cannot be combined with --output")
-		case cmd.String("dir") == "":
-			return errors.New("--all requires --dir")
 		}
 	} else {
 		switch {
@@ -124,11 +122,18 @@ func generate(_ context.Context, cmd *cli.Command) error {
 	return err
 }
 
-// generateAll writes every endpoint into --dir. Endpoints whose private
-// key is not available are skipped, and a failure for one endpoint does not
-// stop the others (R-CLI-6, R-CLI-9).
+// generateAll writes a configuration file for each endpoint to the
+// directory containing the network configuration file, or into the
+// directory specified by --dir.  Endpoints whose private key is not
+// available are skipped, and a failure for one endpoint does not stop
+// the others
+// (R-CLI-6, R-CLI-9).
 func generateAll(cmd *cli.Command, n *network.Network, formats []*render.Format, iface string) error {
 	dir := cmd.String("dir")
+	if dir == "" {
+		// --dir is not present, use directory containing config file (R-CLI-6).
+		dir = filepath.Dir(cmd.String("config"))
+	}
 	if err := os.MkdirAll(dir, 0o700); err != nil { // R-SEC-1
 		return err
 	}

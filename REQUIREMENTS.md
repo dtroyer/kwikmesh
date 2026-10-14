@@ -184,11 +184,12 @@ there so that issues, commits and tests can refer to a single requirement.
 - **R-CLI-5** `generate <endpoint>` writes one endpoint's configuration to
   stdout, or to `--output`. It takes exactly one endpoint name and at most one
   `--format`.
-- **R-CLI-6** `generate --all --dir <dir>` writes every endpoint's
-  configuration into the directory, creating it if needed, and prints a
-  `wrote <path>` line for each file. With `--all`, `--format` can name several
-  formats, comma-separated or repeated, and each endpoint is written in each
-  of them.
+- **R-CLI-6** `generate --all` writes every endpoint's configuration into
+  the directory containing the network configuration file.  if
+  `--dir <dir>` is also present the configuration files are written to
+  that directory, creating it if needed. A `wrote <path>` line is printed
+  for each file. With `--all`, `--format` can name several formats,
+  comma-separated or repeated, and each endpoint is written in each of them.
 - **R-CLI-7** File names are `<endpoint>.conf` for wg, `<endpoint>.uci` for
   uci and `<endpoint>.sh` for uci-script.
 - **R-CLI-8** `--all` cannot be combined with an endpoint name or with

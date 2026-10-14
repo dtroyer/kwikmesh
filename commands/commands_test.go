@@ -194,34 +194,51 @@ func TestGenerateOutput(t *testing.T) {
 
 // R-CLI-6, R-CLI-7, R-SEC-1
 func TestGenerateAll(t *testing.T) {
-	cfg := writeNetwork(t, true)
-	dir := filepath.Join(t.TempDir(), "out", "sub")
+	for _, tt := range []struct {
+		name   string
+		useDir bool // pass --dir, which must be created
+	}{
+		{"dir", true},
+		{"config dir", false},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := writeNetwork(t, true)
+			args := []string{"-c", cfg, "gen", "--all", "-f", "wg,uci", "-f", "uci-script"}
+			dir := filepath.Dir(cfg)
+			if tt.useDir {
+				dir = filepath.Join(t.TempDir(), "out", "sub")
+				args = append(args, "--dir", dir)
+			}
 
-	out := mustRun(t, "-c", cfg, "gen", "--all", "--dir", dir, "-f", "wg,uci", "-f", "uci-script")
-	var want []string
-	for _, name := range []string{"router", "laptop", "phone"} {
-		for _, ext := range []string{".conf", ".uci", ".sh"} {
-			want = append(want, "wrote "+filepath.Join(dir, name+ext))
-		}
-	}
-	if got := strings.Split(strings.TrimSuffix(out, "\n"), "\n"); !slices.Equal(got, want) {
-		t.Errorf("output:\n%s\nwant:\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))
-	}
+			out := mustRun(t, args...)
+			var want []string
+			for _, name := range []string{"router", "laptop", "phone"} {
+				for _, ext := range []string{".conf", ".uci", ".sh"} {
+					want = append(want, "wrote "+filepath.Join(dir, name+ext))
+				}
+			}
+			if got := strings.Split(strings.TrimSuffix(out, "\n"), "\n"); !slices.Equal(got, want) {
+				t.Errorf("output:\n%s\nwant:\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))
+			}
 
-	if m := fileMode(t, dir); m != 0o700 {
-		t.Errorf("directory mode = %o, want 700", m)
-	}
-	for _, f := range []struct {
-		name string
-		mode os.FileMode
-	}{{"laptop.conf", 0o600}, {"laptop.uci", 0o600}, {"laptop.sh", 0o700}} {
-		if m := fileMode(t, filepath.Join(dir, f.name)); m != f.mode {
-			t.Errorf("%s: mode = %o, want %o", f.name, m, f.mode)
-		}
-	}
-	wantConf := mustRun(t, "-c", cfg, "gen", "laptop")
-	if got, _ := os.ReadFile(filepath.Join(dir, "laptop.conf")); string(got) != wantConf {
-		t.Errorf("laptop.conf differs from generate laptop")
+			if tt.useDir {
+				if m := fileMode(t, dir); m != 0o700 {
+					t.Errorf("directory mode = %o, want 700", m)
+				}
+			}
+			for _, f := range []struct {
+				name string
+				mode os.FileMode
+			}{{"laptop.conf", 0o600}, {"laptop.uci", 0o600}, {"laptop.sh", 0o700}} {
+				if m := fileMode(t, filepath.Join(dir, f.name)); m != f.mode {
+					t.Errorf("%s: mode = %o, want %o", f.name, m, f.mode)
+				}
+			}
+			wantConf := mustRun(t, "-c", cfg, "gen", "laptop")
+			if got, _ := os.ReadFile(filepath.Join(dir, "laptop.conf")); string(got) != wantConf {
+				t.Errorf("laptop.conf differs from generate laptop")
+			}
+		})
 	}
 }
 
@@ -320,7 +337,6 @@ func TestGenerateUsageErrors(t *testing.T) {
 		{[]string{"gen", "router", "-d", "x"}, "km: --dir is only valid with --all\n"},
 		{[]string{"gen", "-a", "router", "-d", "x"}, "km: --all cannot be combined with an endpoint name\n"},
 		{[]string{"gen", "-a", "-o", "x", "-d", "x"}, "km: --all cannot be combined with --output\n"},
-		{[]string{"gen", "-a"}, "km: --all requires --dir\n"},
 		{[]string{"gen", "nobody"}, "km: unknown endpoint \"nobody\"\n"},
 		{[]string{"gen", "router", "-i", "no/slash"}, "km: invalid interface name \"no/slash\": use up to 15 letters, digits and _=+.-\n"},
 	} {
